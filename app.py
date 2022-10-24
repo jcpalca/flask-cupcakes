@@ -5,9 +5,9 @@ from flask import Flask, jsonify, request
 from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-  "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
+# app.config['SQLALCHEMY_DATABASE_URI'] = (
+#   "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -114,8 +114,8 @@ def delete_cupcake(cupcake_id):
     """
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
-    cupcake.query.delete()
-
+    # cupcake.query.delete() why did this line delete everything?
+    db.session.delete(cupcake)
     db.session.commit()
 
     return jsonify(deleted=cupcake_id)
