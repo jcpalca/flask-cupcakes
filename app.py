@@ -5,9 +5,9 @@ from flask import Flask, jsonify, request
 from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = (
-#   "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+  "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -79,15 +79,43 @@ def create_new_cupcake():
 
     return (jsonify(cupcake=serialized), 201)
 
+@app.patch(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
+def update_cupcake_info(cupcake_id):
+    """
+    Update cupcake info with tasty new facts!!!
 
-#### Comment out below for code review
+    Raise 404 error if cupcake cannot be found
 
-# @app.patch(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
-# def update_cupcake_info(cupcake_id):
-#     """
-#     Update cupcake info
-#     """
-    
-#     cupcake = Cupcake.query.get_or_404(cupcake_id)
+    Return JSON {cupcake: {id, flavor, size, rating, image}}
+    """
 
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
 
+    cupcake.flavor = request.json["flavor"] or cupcake.flavor
+    cupcake.size = request.json["size"] or cupcake.size
+    cupcake.rating = request.json["rating"] or cupcake.rating
+    cupcake.image = request.json["image"] or cupcake.image
+
+    db.session.add(cupcake)
+    db.session.commit()
+
+    serialized = cupcake.serialize()
+
+    return jsonify(cupcake=serialized)
+
+@app.delete(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
+def delete_cupcake(cupcake_id):
+    """
+    Delete cupcake
+
+    Raise 404 error if cupcake cannot be found
+
+    Return confirmation of deletion JSON {deleted: [cupcake-id]}
+    """
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+    cupcake.query.delete()
+
+    db.session.commit()
+
+    return jsonify(deleted=cupcake_id)
