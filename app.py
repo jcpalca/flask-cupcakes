@@ -1,11 +1,13 @@
 """Flask app for Cupcakes"""
-from flask import Flask, jsonify
+from crypt import methods
+from flask import Flask, jsonify, request
 
 from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-  "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
+# app.config['SQLALCHEMY_DATABASE_URI'] = (
+#   "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -14,6 +16,9 @@ connect_db(app)
 app.config['SECRET_KEY'] = "GET OUTTA MY DB!!!"
 
 BASE_API_URL = '/api/cupcakes'
+
+# @app.route(BASE_API_URL, methods=['GET','POST'])
+
 
 @app.get(BASE_API_URL)
 def list_all_cupcakes():
@@ -27,6 +32,7 @@ def list_all_cupcakes():
     serialized = [c.serialize() for c in cupcakes]
 
     return jsonify(cupcakes=serialized)
+
 
 @app.get(f"{BASE_API_URL}/<int:cupcake_id>")
 def list_single_cupcake(cupcake_id):
@@ -42,5 +48,33 @@ def list_single_cupcake(cupcake_id):
     serialized = cupcake.serialize()
 
     return jsonify(cupcake=serialized)
+
+
+@app.post(BASE_API_URL)
+def create_new_cupcake():
+    """
+    Collect data from form and add the cupcake to the DB
+    """
+
+    flavor = request.json["flavor"]
+    size = request.json["size"]
+    rating = request.json["rating"]
+    image = request.json["image"]
+
+    new_cupcake = Cupcake(
+        flavor=flavor,
+        size=size,
+        rating=rating,
+        image=image,
+    )
+
+    db.session.add(new_cupcake)
+    db.session.commit()
+
+    serialized = new_cupcake.serialize()
+
+    return (jsonify(cupcake=serialized), 201)
+
+
 
 
