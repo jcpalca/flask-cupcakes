@@ -5,9 +5,9 @@ from flask import Flask, jsonify, request
 from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = (
-#   "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -16,6 +16,7 @@ connect_db(app)
 app.config['SECRET_KEY'] = "GET OUTTA MY DB!!!"
 
 CUPCAKES_ENDPOINT = '/api/cupcakes'
+
 
 @app.get(CUPCAKES_ENDPOINT)
 def list_all_cupcakes():
@@ -79,6 +80,7 @@ def create_new_cupcake():
 
     return (jsonify(cupcake=serialized), 201)
 
+
 @app.patch(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
 def update_cupcake_info(cupcake_id):
     """
@@ -102,6 +104,7 @@ def update_cupcake_info(cupcake_id):
     serialized = cupcake.serialize()
 
     return jsonify(cupcake=serialized)
+
 
 @app.delete(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
 def delete_cupcake(cupcake_id):
