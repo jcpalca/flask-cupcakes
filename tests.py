@@ -4,9 +4,9 @@ from app import app
 from models import db, connect_db, Cupcake
 
 # Use test database and don't clutter tests with SQL
-# app.config['SQLALCHEMY_DATABASE_URI'] = (
-#   "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes_test'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    "postgresql://otherjoel:hello@13.57.9.123/otherjoel_test")
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes_test'
 app.config['SQLALCHEMY_ECHO'] = False
 
 # Make Flask errors be real errors, rather than HTML pages with error info
@@ -89,6 +89,13 @@ class CupcakeViewsTestCase(TestCase):
                 }
             })
 
+    def test_get_missing_cupcake(self):
+        with app.test_client() as client:
+            url = "/api/cupcakes/1000"
+            resp = client.get(url)
+
+            self.assertEqual(resp.status_code, 404)
+
     def test_create_cupcake(self):
         with app.test_client() as client:
             url = "/api/cupcakes"
@@ -113,14 +120,13 @@ class CupcakeViewsTestCase(TestCase):
 
             self.assertEqual(Cupcake.query.count(), 2)
 
-    def test_update_cupcake(self):
+    def test_patch_cupcake(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake.id}"
 
             new_cupcake_data = {
                 "flavor": "cereal",
                 "rating": 10,
-                "size": "",
                 "image": "",
             }
             resp = client.patch(url, json=new_cupcake_data)
@@ -129,17 +135,51 @@ class CupcakeViewsTestCase(TestCase):
 
             data = resp.json.copy()
 
-            # don't know what ID we'll get, make sure it's an int & normalize
-            self.assertIsInstance(data['cupcake']['id'], int)
-            del data['cupcake']['id']
-
             self.assertEqual(data, {
                 "cupcake": {
+                    "id" : self.cupcake.id,
                     "flavor": "cereal",
                     "size": "TestSize",
                     "rating": 10,
-                    "image": "http://test.com/cupcake.jpg"
+                    "image": "",
                 }
             })
 
-    
+    def test_patch_missing_cupcake(self):
+        with app.test_client() as client:
+            url = "/api/cupcakes/1000"
+
+            new_cupcake_data = {
+                "flavor": "cereal",
+                "rating": 10,
+                "image": "",
+            }
+            resp = client.patch(url, json=new_cupcake_data)
+
+            self.assertEqual(resp.status_code, 404)
+
+    def test_delete_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+
+            # Make sure a cupcake is there to be deleted
+            self.assertEqual(Cupcake.query.count(), 1)
+
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(Cupcake.query.count(), 0)
+
+            data = resp.json.copy()
+
+            self.assertEqual(data, {
+                "deleted": self.cupcake.id
+            })
+
+    def test_delete_missing_cupcake(self):
+        with app.test_client() as client:
+            url = "/api/cupcakes/1000"
+
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 404)
