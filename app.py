@@ -15,12 +15,9 @@ connect_db(app)
 
 app.config['SECRET_KEY'] = "GET OUTTA MY DB!!!"
 
-BASE_API_URL = '/api/cupcakes'
+CUPCAKES_ENDPOINT = '/api/cupcakes'
 
-# @app.route(BASE_API_URL, methods=['GET','POST'])
-
-
-@app.get(BASE_API_URL)
+@app.get(CUPCAKES_ENDPOINT)
 def list_all_cupcakes():
     """
     Get data about all cupcakes
@@ -34,7 +31,7 @@ def list_all_cupcakes():
     return jsonify(cupcakes=serialized)
 
 
-@app.get(f"{BASE_API_URL}/<int:cupcake_id>")
+@app.get(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
 def list_single_cupcake(cupcake_id):
     """
     Get data about a single cupcake
@@ -50,16 +47,23 @@ def list_single_cupcake(cupcake_id):
     return jsonify(cupcake=serialized)
 
 
-@app.post(BASE_API_URL)
+@app.post(CUPCAKES_ENDPOINT)
 def create_new_cupcake():
     """
-    Collect data from form and add the cupcake to the DB
+    Collect flavor, size, rating, and image URL from the form.
+
+    Check if image URL is empty, and if so use default image URL provided
+    in models.py
+
+    Add new cupcake to database
+
+    Return JSON {cupcake: {id, flavor, size, rating, image}}
     """
 
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
-    image = request.json["image"]
+    image = request.json["image"] or None
 
     new_cupcake = Cupcake(
         flavor=flavor,
@@ -76,5 +80,14 @@ def create_new_cupcake():
     return (jsonify(cupcake=serialized), 201)
 
 
+#### Comment out below for code review
+
+# @app.patch(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
+# def update_cupcake_info(cupcake_id):
+#     """
+#     Update cupcake info
+#     """
+    
+#     cupcake = Cupcake.query.get_or_404(cupcake_id)
 
 
