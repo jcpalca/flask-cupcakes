@@ -82,21 +82,23 @@ def create_new_cupcake():
 
 
 @app.patch(f"{CUPCAKES_ENDPOINT}/<int:cupcake_id>")
-def update_cupcake_info(cupcake_id):
+def patch_cupcake_info(cupcake_id):
     """
-    Update cupcake info with tasty new facts!!!
+    Patch cupcake info with tasty new facts!!!
 
     Raise 404 error if cupcake cannot be found
 
     Return JSON {cupcake: {id, flavor, size, rating, image}}
     """
 
+    data = request.json
+
     cupcake = Cupcake.query.get_or_404(cupcake_id)
 
-    cupcake.flavor = request.json["flavor"] or cupcake.flavor
-    cupcake.size = request.json["size"] or cupcake.size
-    cupcake.rating = request.json["rating"] or cupcake.rating
-    cupcake.image = request.json["image"] or cupcake.image
+    cupcake.flavor = data.get("flavor", cupcake.flavor)
+    cupcake.size = data.get("size", cupcake.size)
+    cupcake.rating = data.get("rating", cupcake.rating)
+    cupcake.image = data.get("image", cupcake.image)
 
     db.session.add(cupcake)
     db.session.commit()
@@ -117,7 +119,7 @@ def delete_cupcake(cupcake_id):
     """
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
-    # cupcake.query.delete() why did this line delete everything?
+    
     db.session.delete(cupcake)
     db.session.commit()
 
