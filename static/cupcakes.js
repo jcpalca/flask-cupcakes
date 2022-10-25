@@ -2,12 +2,17 @@
 
 const BASE_URL = "http://127.0.0.1:5001/api";
 const $cupcakeList = $(".cupcake-list")
-const $cupcakeForm = $(".add-cupcake")
-
+const $cupcakeForm = $("#add-cupcake")
+//new controller calls getCupcakes and populateList
 async function populateCupcakeList() {
     $cupcakeList.empty()
+    
+    //move to controller function
     let cupcakes = await getCupcakes();
+    
     for (let cupcake of cupcakes) {
+        
+        //make into it's own function
         let $listItem = $(
             `
             <div id="${cupcake.id}">
@@ -34,6 +39,7 @@ async function getCupcakes() {
 }
 
 async function addNewCupcake(evt) {
+    console.debug("addNewCupcake ran!")
     evt.preventDefault();
 
     let flavor = $("#flavor").val()
@@ -53,4 +59,4 @@ async function addNewCupcake(evt) {
 
 $cupcakeForm.on("submit", addNewCupcake);
 
-await populateCupcakeList();
+populateCupcakeList();
