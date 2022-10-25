@@ -4,9 +4,9 @@ from app import app
 from models import db, connect_db, Cupcake
 
 # Use test database and don't clutter tests with SQL
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    "postgresql://otherjoel:hello@13.57.9.123/otherjoel_test")
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes_test'
+# app.config['SQLALCHEMY_DATABASE_URI'] = (
+#     "postgresql://otherjoel:hello@13.57.9.123/otherjoel_test")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes_test'
 app.config['SQLALCHEMY_ECHO'] = False
 
 # Make Flask errors be real errors, rather than HTML pages with error info

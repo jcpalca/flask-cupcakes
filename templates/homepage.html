@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Check out our cupcakes!</h1>
+<ul class="cupcake-list">
+    <!--Cupcakes populated with JS-->
+</ul>
+<form id="add-cupcake" action="/api/cupcakes" method="POST">
+
+    <div>
+        <label for="flavor">Flavor:</label>
+        <input type="text" id="flavor" name="flavor">
+    </div>
+
+    <div>
+        <label for="size">Size:</label>
+        <input type="text" id="size" name="size">
+    </div>
+
+    <div>
+        <label for="rating">Rating:</label>
+        <input type="text" id="rating" name="rating">
+    </div>
+    <div>
+        <label for="image-url">Image url:</label>
+        <input type="text" id="image-url" name="image-url">
+    </div>
+
+</form>
+
+{% endblock %}

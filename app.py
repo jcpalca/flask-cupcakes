@@ -1,13 +1,13 @@
 """Flask app for Cupcakes"""
 from crypt import methods
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
+# app.config['SQLALCHEMY_DATABASE_URI'] = (
+#     "postgresql://otherjoel:hello@13.57.9.123/otherjoel")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -16,6 +16,13 @@ connect_db(app)
 app.config['SECRET_KEY'] = "GET OUTTA MY DB!!!"
 
 CUPCAKES_ENDPOINT = '/api/cupcakes'
+
+@app.get("/")
+def render_homepage():
+    """Render homepage"""
+
+    return render_template("homepage.html")
+
 
 
 @app.get(CUPCAKES_ENDPOINT)
@@ -124,3 +131,6 @@ def delete_cupcake(cupcake_id):
     db.session.commit()
 
     return jsonify(deleted=cupcake_id)
+
+
+
